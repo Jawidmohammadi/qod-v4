@@ -59,11 +59,13 @@ public class User implements FlatUser {
   @NotBlank
   private String displayName;
 
+  @NonNull
   @Enumerated(value = EnumType.ORDINAL)
-  private Role role;
+  private Role role = Role.USER;
 
   @JsonIgnore
   @NonNull
+  @Column(nullable = false, updatable = false, unique = true)
   private String oauthKey;
 
   @Override

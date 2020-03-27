@@ -2,6 +2,7 @@ package edu.cnm.deepdive.qod.controller.rest;
 
 import edu.cnm.deepdive.qod.model.entity.Quote;
 import edu.cnm.deepdive.qod.model.entity.Source;
+import edu.cnm.deepdive.qod.model.entity.User;
 import edu.cnm.deepdive.qod.service.QuoteService;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -14,6 +15,7 @@ import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +43,9 @@ public class QuoteController {
 
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Quote> post(@RequestBody @Valid Quote quote) {
+  public ResponseEntity<Quote> post(@RequestBody @Valid Quote quote, Authentication auth) {
+    User user = (User) auth.getPrincipal();
+    quote.setContributer(user);
     quote = quoteService.create(quote);
     return ResponseEntity.created(quote.getHref()).body(quote);
   }
@@ -102,7 +106,7 @@ public class QuoteController {
 
   @PutMapping(value = "/{quoteId}/source",
       consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Source> putAttribution(@PathVariable UUID quoteId, @RequestBody Source source) {
+  public ResponseEntity<Source> putAttribution(@PathVariable UUID quoteId, @RequestBody @Valid Source source) {
     return ResponseEntity.of(quoteService.update(quoteId, source));
   }
 
